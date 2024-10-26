@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Marketing Presentation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 9999;
+        }
+        
+        /* Add fade transition */
+        .slide-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Keyboard shortcuts overlay */
+        .keyboard-shortcuts {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .keyboard-shortcuts:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { ChevronLeft, ChevronRight, Maximize, Minimize } = lucide;
+
+        // [Previous slides array stays the same]
+        const slides = [/* ... previous slides array ... */];
+
+        function Presentation() {
+            const [currentSlide, setCurrentSlide] = React.useState(0);
+            const [isFullscreen, setIsFullscreen] = React.useState(false);
+            const presentationRef = React.useRef(null);
+
+            // Navigation functions
+            const nextSlide = () => {
+                if (currentSlide < slides.length - 1) {
+                    setCurrentSlide(currentSlide + 1);
+                }
+            };
+
+            const prevSlide = () => {
+                if (currentSlide > 0) {
+                    setCurrentSlide(currentSlide - 1);
+                }
+            };
+
+            // Fullscreen functions
+            const toggleFullscreen = () => {
+                if (!document.fullscreenElement) {
+                    presentationRef.current.requestFullscreen();
+                    setIsFullscreen(true);
+                } else {
+                    document.exitFullscreen();
+                    setIsFullscreen(false);
+                }
+            };
+
+            // Keyboard navigation
+            React.useEffect(() => {
+                const handleKeyPress = (e) => {
+                    switch(e.key) {
+                        case 'ArrowRight':
+                        case 'Space':
+                        case 'n':
+                            nextSlide();
+                            break;
+                        case 'ArrowLeft':
+                        case 'p':
+                        case 'Backspace':
+                            prevSlide();
+                            break;
+                        case 'f':
+                            toggleFullscreen();
+                            break;
+                        case 'Escape':
+                            if (isFullscreen) {
+                                setIsFullscreen(false);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
+                window.addEventListener('keydown', handleKeyPress);
+                
+                // Fullscreen change detection
+                const handleFullscreenChange = () => {
+                    setIsFullscreen(!!document.fullscreenElement);
+                };
+                
+                document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+                return () => {
+                    window.removeEventListener('keydown', handleKeyPress);
+                    document.removeEventListener('fullscreenchange', handleFullscreenChange);
+                };
+            }, [currentSlide, isFullscreen]);
+
+            // [Previous renderSlideContent function stays the same]
+            const renderSlideContent = (slide) => {
+                // ... previous render logic ...
+            };
+
+            return (
+                <div 
+                    ref={presentationRef}
+                    className={`${isFullscreen ? 'fullscreen' : 'min-h-screen'} bg-gray-100 p-8`}
+                >
+                    <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-xl p-12 min-h-[600px] relative">
+                        <div className="absolute top-4 right-4 z-10">
+                            <button
+                                onClick={toggleFullscreen}
+                                className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+                            >
+                                {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
+                            </button>
+                        </div>
+
+                        <div className="slide-content">
+                            {renderSlideContent(slides[currentSlide])}
+                        </div>
+                        
+                        <div className="absolute bottom-6 left-0 right-0 flex justify-between px-8">
+                            <button
+                                onClick={prevSlide}
+                                disabled={currentSlide === 0}
+                                className="p-2 rounded-full bg-gray-200 disabled:opacity-50 hover:bg-gray-300 transition-colors"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            
+                            <span className="text-gray-600">
+                                {currentSlide + 1} / {slides.length}
+                            </span>
+                            
+                            <button
+                                onClick={nextSlide}
+                                disabled={currentSlide === slides.length - 1}
+                                className="p-2 rounded-full bg-gray-200 disabled:opacity-50 hover:bg-gray-300 transition-colors"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="keyboard-shortcuts">
+                        ← → : Navigate | F : Fullscreen | ESC : Exit
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Presentation />, document.getElementById('root'));
+    </script>
+</body>
+</html>
