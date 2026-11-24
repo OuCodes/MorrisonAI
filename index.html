@@ -8,18 +8,6 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: white;
-            z-index: 9999;
-            padding: 2rem;
-        }
-    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -215,7 +203,6 @@
 
         function Presentation() {
             const [currentSlide, setCurrentSlide] = React.useState(0);
-            const [isFullscreen, setIsFullscreen] = React.useState(false);
 
             const nextSlide = () => {
                 if (currentSlide < slides.length - 1) {
@@ -292,7 +279,7 @@
             };
 
             return (
-                <div className={`${isFullscreen ? 'fullscreen' : 'min-h-screen bg-gray-100 p-8'}`}>
+                <div className="min-h-screen bg-gray-100 p-8">
                     <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-xl p-12 min-h-[600px] relative">
                         {renderSlideContent(slides[currentSlide])}
                         
